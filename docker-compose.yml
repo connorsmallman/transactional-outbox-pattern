@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+        POSTGRES_PASSWORD: password
+        POSTGRES_USER: user
+        POSTGRES_DB: db
+    ports:
+      - '5433:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+    ports:
+      - '4999:4999'
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+
+volumes:
+  db:
+  node_modules:
