@@ -45,7 +45,7 @@ export class OrganisationRepository {
 
       const outboxTypeormEntity = new OutboxTypeormEntity();
       outboxTypeormEntity.name = event.constructor.name;
-      outboxTypeormEntity.data = organisation;
+      outboxTypeormEntity.payload = organisation;
       outboxTypeormEntity.timestamp = event.dateTimeOccurred;
       await queryRunner.manager.save(outboxTypeormEntity);
 
@@ -75,7 +75,7 @@ export class OrganisationRepository {
       for (const event of outbox) {
         const outboxTypeormEntity = new OutboxTypeormEntity();
         outboxTypeormEntity.name = event.constructor.name;
-        outboxTypeormEntity.data = event.data;
+        outboxTypeormEntity.payload = event.payload;
         outboxTypeormEntity.timestamp = event.dateTimeOccurred;
         await queryRunner.manager.save(event);
       }

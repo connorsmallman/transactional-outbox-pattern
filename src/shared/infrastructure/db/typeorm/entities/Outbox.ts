@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, AfterInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Outbox {
@@ -12,5 +12,5 @@ export class Outbox {
   timestamp: Date;
 
   @Column('json')
-  data: any;
+  payload: any;
 }

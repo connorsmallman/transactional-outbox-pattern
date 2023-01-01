@@ -1,4 +1,4 @@
 export interface DomainEvent {
-  data: any;
+  payload: any;
   dateTimeOccurred: Date;
 }

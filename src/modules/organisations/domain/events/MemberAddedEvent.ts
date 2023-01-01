@@ -4,10 +4,10 @@ import { Member } from '../Member';
 export class MemberAddedEvent implements DomainEvent {
   dateTimeOccurred: Date;
 
-  data: Member;
+  payload: Member;
 
   constructor(member: Member) {
     this.dateTimeOccurred = new Date();
-    this.data = member;
+    this.payload = member;
   }
 }
