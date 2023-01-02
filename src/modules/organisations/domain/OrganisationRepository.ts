@@ -6,6 +6,8 @@ import { Organisation as OrganisationTypeormEntity } from '../infrastructure/db/
 import { Outbox as OutboxTypeormEntity } from '../../../shared/infrastructure/db/typeorm/entities/Outbox';
 import { OrganisationAggregate } from './OrganisationAggregate';
 import { OrganisationName } from './OrganisationName';
+import { taskEither } from 'fp-ts';
+import { pipe } from 'fp-ts/function';
 
 @Injectable()
 export class OrganisationRepository {
@@ -16,45 +18,56 @@ export class OrganisationRepository {
     private readonly organisationRepository: Repository<OrganisationTypeormEntity>,
   ) {}
 
-  async findById(id: string): Promise<OrganisationAggregate> {
-    const organisation = await this.organisationRepository.findOneBy({ id });
-    if (!organisation) {
-      return Promise.reject(new Error('Organisation not found'));
-    }
-    const name = new OrganisationName(organisation.name);
-    return OrganisationAggregate.create(name, [], [], id);
+  findById(id: string): taskEither.TaskEither<Error, OrganisationAggregate> {
+    return pipe(
+      taskEither.tryCatch(
+        () => this.organisationRepository.findOne({ where: { id } }),
+        (error: unknown) => new Error(String(error)),
+      ),
+      taskEither.chain((organisationTypeormEntity) => {
+        if (!organisationTypeormEntity) {
+          return taskEither.left(new Error('Organisation not found'));
+        }
+
+        return taskEither.right(
+          OrganisationAggregate.create(
+            new OrganisationName(organisationTypeormEntity.name),
+            [],
+            [],
+            organisationTypeormEntity.id,
+          ),
+        );
+      }),
+    );
   }
 
-  async save(organisation: OrganisationAggregate): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
+  save(
+    organisation: OrganisationAggregate,
+  ): taskEither.TaskEither<Error, OrganisationAggregate> {
+    return pipe(
+      taskEither.tryCatch(
+        () =>
+          this.dataSource.transaction(async (entityManager) => {
+            const organisationTypeormEntity = new OrganisationTypeormEntity({
+              name: organisation.name,
+              id: organisation.id,
+            });
+            await entityManager.save(organisationTypeormEntity);
 
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+            const outbox = organisation.getDomainEvents();
 
-    try {
-      const organisationTypeormEntity = new OrganisationTypeormEntity({
-        name: organisation.getName(),
-        id: organisation.id,
-      });
-      await queryRunner.manager.save(organisationTypeormEntity);
-
-      const outbox = organisation.getDomainEvents();
-
-      for (const event of outbox) {
-        const outboxTypeormEntity = new OutboxTypeormEntity({
-          name: event.constructor.name,
-          payload: event.payload,
-          timestamp: event.dateTimeOccurred,
-        });
-        await queryRunner.manager.save(event);
-      }
-
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      return Promise.reject(err);
-    } finally {
-      await queryRunner.release();
-    }
+            for (const event of outbox) {
+              const outboxTypeormEntity = new OutboxTypeormEntity({
+                name: event.constructor.name,
+                payload: event.payload,
+                timestamp: event.dateTimeOccurred,
+              });
+              await entityManager.save(outboxTypeormEntity);
+            }
+          }),
+        (error: unknown) => new Error(String(error)),
+      ),
+      taskEither.map(() => organisation),
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { AddMemberToOrganisationUseCase } from '../../usecases/AddMemberToOrganisationUseCase';
 import { CreateOrganisationUseCase } from '../../usecases/CreateOrganisationUseCase';
+import { either } from 'fp-ts';
 
 @Controller('organisations')
 export class OrganisationsController {
@@ -10,17 +11,22 @@ export class OrganisationsController {
   ) {}
 
   @Post()
-  createOrganisation(@Body() body) {
+  async createOrganisation(@Body() body) {
     if (!body.name) {
       throw new Error('Missing name');
     }
-    return this.createOrganisationUseCase.execute({
+    const response = await this.createOrganisationUseCase.execute({
       name: body.name,
-    });
+    })();
+    if (either.isLeft(response)) {
+      throw new Error(response.left.message);
+    } else {
+      return response.right;
+    }
   }
 
   @Put(':organisation_id/members')
-  addMemberToOrganisation(
+  async addMemberToOrganisation(
     @Param('organisation_id') organisationId: string,
     @Body() body,
   ) {
@@ -32,6 +38,13 @@ export class OrganisationsController {
         name: body.name,
       },
     };
-    return this.addMemberToOrganisationUseCase.execute(request);
+    const response = await this.addMemberToOrganisationUseCase.execute(
+      request,
+    )();
+    if (either.isLeft(response)) {
+      throw new Error(response.left.message);
+    } else {
+      return response.right;
+    }
   }
 }

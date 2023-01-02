@@ -38,7 +38,7 @@ export class OrganisationAggregate implements RootAggregate {
     return this.domainEvents;
   }
 
-  addMember(member: Member): OrganisationAggregate {
+  public addMember(member: Member): OrganisationAggregate {
     const newMembers = [...this.members, member];
     const newDomainEvents = [
       ...this.domainEvents,

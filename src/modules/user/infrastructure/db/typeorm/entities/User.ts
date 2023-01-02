@@ -1,4 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { v4 } from 'uuid';
 @Entity()
 export class User extends BaseEntity {
   @PrimaryColumn('uuid')
@@ -15,7 +16,7 @@ export class User extends BaseEntity {
 
   constructor(props) {
     super();
-    this.id = props.id;
+    this.id = props.id || v4();
     this.name = props.name;
     this.email = props.email;
     this.password = props.password;

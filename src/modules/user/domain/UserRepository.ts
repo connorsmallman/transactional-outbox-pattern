@@ -6,6 +6,8 @@ import { Outbox as OutboxTypeormEntity } from '../../../shared/infrastructure/db
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { UserFactory } from './UserFactory';
+import { taskEither } from 'fp-ts';
+import { pipe } from 'fp-ts/function';
 @Injectable()
 export class UserRepository {
   constructor(
@@ -14,61 +16,59 @@ export class UserRepository {
     private readonly userFactory: UserFactory,
   ) {}
 
-  async findById(id: string): Promise<UserAggregate> {
-    const userTypeormEntity = await this.dataSource.manager.findOne(
-      UserTypeormEntity,
-      { where: { id } },
+  findById(id: string): taskEither.TaskEither<Error, UserAggregate> {
+    return pipe(
+      taskEither.tryCatch(
+        () =>
+          this.dataSource.manager.findOne(UserTypeormEntity, { where: { id } }),
+        (error: unknown) => new Error(String(error)),
+      ),
+      taskEither.chain((userTypeormEntity) => {
+        if (!userTypeormEntity) {
+          return taskEither.left(new Error('User not found'));
+        }
+
+        return taskEither.tryCatch(
+          () =>
+            this.userFactory.createFromPersistence(
+              userTypeormEntity.name,
+              userTypeormEntity.email,
+              userTypeormEntity.password,
+              userTypeormEntity.id,
+            ),
+          (error: unknown) => new Error('Failed to create user from raw data'),
+        );
+      }),
     );
-
-    if (!userTypeormEntity) {
-      return Promise.reject(new Error('User not found'));
-    }
-
-    const user = await this.userFactory.createFromPersistence(
-      userTypeormEntity.name,
-      userTypeormEntity.email,
-      userTypeormEntity.password,
-      userTypeormEntity.id,
-    );
-
-    return user;
   }
 
-  async save(user: UserAggregate): Promise<UserAggregate> {
-    const queryRunner = this.dataSource.createQueryRunner();
+  save(user: UserAggregate): taskEither.TaskEither<Error, UserAggregate> {
+    return pipe(
+      taskEither.tryCatch(
+        () =>
+          this.dataSource.transaction(async (entityManager) => {
+            const userTypeormEntity = new UserTypeormEntity({
+              name: user.name,
+              email: user.email,
+              password: user.password,
+              id: user.id,
+            });
+            await entityManager.save(userTypeormEntity);
 
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+            const outbox = user.getDomainEvents();
 
-    try {
-      const deIdentifiedUser = user.getDeIdentifiedUser();
-      const userTypeormEntity = new UserTypeormEntity({
-        name: deIdentifiedUser.name,
-        email: deIdentifiedUser.email,
-        password: deIdentifiedUser.password,
-        id: user.id,
-      });
-      await queryRunner.manager.save(userTypeormEntity);
+            for (const event of outbox) {
+              const outboxTypeormEntity = new OutboxTypeormEntity({
+                name: event.constructor.name,
+                payload: event,
+              });
+              await entityManager.save(outboxTypeormEntity);
+            }
 
-      const outbox = user.getDomainEvents();
-
-      for (const event of outbox) {
-        const outboxTypeormEntity = new OutboxTypeormEntity({
-          name: event.constructor.name,
-          payload: event.payload,
-          timestamp: event.dateTimeOccurred,
-        });
-        await queryRunner.manager.save(event);
-      }
-
-      await queryRunner.commitTransaction();
-
-      return user;
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      return Promise.reject(err);
-    } finally {
-      await queryRunner.release();
-    }
+            return user;
+          }),
+        (error: unknown) => new Error(String(error)),
+      ),
+    );
   }
 }
