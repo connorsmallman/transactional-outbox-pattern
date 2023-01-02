@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm';
+import { v4 } from 'uuid';
 
 @Entity()
 export class Organisation extends BaseEntity {
@@ -10,7 +11,7 @@ export class Organisation extends BaseEntity {
 
   constructor(props) {
     super();
-    this.id = props.id;
+    this.id = props.id || v4();
     this.name = props.name;
   }
 }

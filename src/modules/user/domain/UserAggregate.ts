@@ -1,11 +1,10 @@
-import { v4 as uuid } from 'uuid';
-
 import { Email } from './Email';
 import { Password } from './Password';
 import { Name } from './Name';
 
 import { RootAggregate } from '../../../shared/domain/RootAggregate';
 import { DomainEvent } from '../../../shared/domain/DomainEvent';
+import { v4 } from 'uuid';
 
 type DeIdentifiedUser = {
   readonly id: string;
@@ -32,7 +31,7 @@ export class UserAggregate implements RootAggregate {
     domainEvents: readonly DomainEvent[],
     id?: string,
   ) {
-    this.id = id || uuid();
+    this.id = id || v4();
     this.name = name;
     this.email = email;
     this.password = password;
