@@ -1,16 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 
 @Entity()
-export class Outbox {
+export class Outbox extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column()
-  name: string;
+  readonly name: string;
 
   @Column()
-  timestamp: Date;
+  readonly timestamp: Date;
 
   @Column('json')
-  payload: any;
+  readonly payload: any;
+
+  constructor(props) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+    this.timestamp = props.timestamp;
+    this.payload = props.payload;
+  }
 }

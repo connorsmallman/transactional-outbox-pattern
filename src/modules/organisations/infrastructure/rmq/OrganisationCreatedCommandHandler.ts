@@ -5,7 +5,7 @@ import { Controller, Logger } from '@nestjs/common';
 export class OrganisationCreatedCommandHandler {
   @EventPattern('organisation.created')
   async handleOrganisationCreatedCommand(
-    @Payload() data: number[],
+    @Payload() data: readonly number[],
     @Ctx() context: RmqContext,
   ) {
     Logger.log(data);

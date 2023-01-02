@@ -1,12 +1,11 @@
-import { Organisation } from '../Organisation';
 import { DomainEvent } from '../../../../shared/domain/DomainEvent';
 
 export class OrganisationCreatedEvent implements DomainEvent {
-  public dateTimeOccurred: Date;
-  payload: Organisation;
+  public readonly dateTimeOccurred: Date;
+  readonly payload: string;
 
-  constructor(organisation: Organisation) {
+  constructor(organisationId: string) {
     this.dateTimeOccurred = new Date();
-    this.payload = organisation;
+    this.payload = organisationId;
   }
 }

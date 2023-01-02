@@ -1,16 +1,23 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity()
-export class User {
+export class User extends BaseEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  readonly id: string;
 
   @Column()
-  name: string;
+  readonly name: string;
 
   @Column()
-  email: string;
+  readonly email: string;
 
   @Column()
-  password: string;
+  readonly password: string;
+
+  constructor(props) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+    this.email = props.email;
+    this.password = props.password;
+  }
 }

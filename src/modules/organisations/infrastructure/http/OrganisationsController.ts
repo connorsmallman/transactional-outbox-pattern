@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post, Put } from '@nestjs/common';
-import { AddMemberToOrganisationUseCase } from '../../usecases/AddMemberToOrganisation';
+import { AddMemberToOrganisationUseCase } from '../../usecases/AddMemberToOrganisationUseCase';
 import { CreateOrganisationUseCase } from '../../usecases/CreateOrganisationUseCase';
 
 @Controller('organisations')

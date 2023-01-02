@@ -1,39 +1,54 @@
 import { v4 as uuid } from 'uuid';
 
 import { Member } from './Member';
-import { DomainEvent } from '../../../shared/domain/DomainEvent';
 import { MemberAddedEvent } from './events/MemberAddedEvent';
 import { RootAggregate } from '../../../shared/domain/RootAggregate';
+import { DomainEvent } from '../../../shared/domain/DomainEvent';
+import { OrganisationName } from './OrganisationName';
 
-type OrganisationProps = {
-  name: string;
-  members: Member[];
-};
+export class OrganisationAggregate implements RootAggregate {
+  readonly id: string;
+  readonly name: OrganisationName;
 
-export class OrganisationAggregate extends RootAggregate {
-  id: string;
-  props: OrganisationProps;
+  readonly members: readonly Member[];
 
-  constructor(props, id = uuid()) {
-    super();
+  readonly domainEvents: readonly DomainEvent[] = [];
+
+  constructor(name, members, domainEvents, id = uuid()) {
     this.id = id;
-    this.props = props;
+    this.name = name;
+    this.members = members;
+    this.domainEvents = domainEvents;
   }
 
-  get name() {
-    return this.props.name;
+  static create(
+    name: OrganisationName,
+    members: readonly Member[] = [],
+    domainEvents: readonly DomainEvent[] = [],
+    id?: string,
+  ): OrganisationAggregate {
+    return new OrganisationAggregate(name, members, domainEvents, id);
   }
 
-  get members() {
-    return this.props.members;
+  public getName() {
+    return this.name.value;
   }
 
-  static create(props: OrganisationProps, id?: string): OrganisationAggregate {
-    return new OrganisationAggregate(props, id);
+  public getDomainEvents() {
+    return this.domainEvents;
   }
 
-  addMember(member: Member) {
-    this.props.members.push(member);
-    this.addDomainEvent(new MemberAddedEvent(member));
+  addMember(member: Member): OrganisationAggregate {
+    const newMembers = [...this.members, member];
+    const newDomainEvents = [
+      ...this.domainEvents,
+      new MemberAddedEvent(member),
+    ];
+    return new OrganisationAggregate(
+      this.name,
+      newMembers,
+      newDomainEvents,
+      this.id,
+    );
   }
 }

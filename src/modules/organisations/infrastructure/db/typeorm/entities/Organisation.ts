@@ -1,10 +1,16 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm';
 
 @Entity()
-export class Organisation {
+export class Organisation extends BaseEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  readonly id: string;
 
   @Column()
-  name: string;
+  readonly name: string;
+
+  constructor(props) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+  }
 }

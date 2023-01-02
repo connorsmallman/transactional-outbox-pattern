@@ -5,8 +5,14 @@ import { Name } from './Name';
 import { Email } from './Email';
 import { Password } from './Password';
 import { UserCreatedEvent } from './events/UserCreatedEvent';
+import { Injectable } from '@nestjs/common';
+import { IdentificationLookupService } from '../services/IdentificationLookupService';
 
+@Injectable()
 export class UserFactory {
+  constructor(
+    private readonly identificationLookupService: IdentificationLookupService,
+  ) {}
 
   static createNewUser(
     rawName: string,
@@ -18,23 +24,32 @@ export class UserFactory {
     const password = new Password(rawPassword);
     const id = v4();
 
-    const user = new UserAggregate(name, email, password, id);
-
-    user.addDomainEvent(new UserCreatedEvent(id));
-
-    return user;
+    return new UserAggregate(
+      name,
+      email,
+      password,
+      [new UserCreatedEvent(id)],
+      id,
+    );
   }
-
-  static createFromPersistence(
+  async createFromPersistence(
     nameKey: string,
     emailKey: string,
     passwordKey: string,
     id: string,
-  ): UserAggregate {
-    const name = new Name('', nameKey);
-    const email = new Email('', emailKey);
-    const password = new Password('', passwordKey);
+  ): Promise<UserAggregate> {
+    const nameValue = await this.identificationLookupService.findById(nameKey);
+    const emailValue = await this.identificationLookupService.findById(
+      emailKey,
+    );
+    const passwordValue = await this.identificationLookupService.findById(
+      passwordKey,
+    );
 
-    return new UserAggregate(name, email, password, id);
+    const name = new Name(nameValue, nameKey);
+    const email = new Email(emailValue, emailKey);
+    const password = new Password(passwordValue, passwordKey);
+
+    return new UserAggregate(name, email, password, [], id);
   }
 }

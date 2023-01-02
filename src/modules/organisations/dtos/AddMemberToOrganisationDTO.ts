@@ -1,8 +1,8 @@
-export type AddMemberToOrganisationDTO = {
-  organisationId: string;
-  member: {
-    id: string;
-    role: string;
-    name: string;
+export interface AddMemberToOrganisationDTO {
+  readonly organisationId: string;
+  readonly member: {
+    readonly id: string;
+    readonly role: string;
+    readonly name: string;
   };
-};
+}

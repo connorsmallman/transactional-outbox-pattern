@@ -5,29 +5,38 @@ import { Password } from './Password';
 import { Name } from './Name';
 
 import { RootAggregate } from '../../../shared/domain/RootAggregate';
+import { DomainEvent } from '../../../shared/domain/DomainEvent';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-}
+type DeIdentifiedUser = {
+  readonly id: string;
+  readonly email: string;
+  readonly name: string;
+  readonly password: string;
+};
 
-export class UserAggregate extends RootAggregate {
-  id: string;
+export class UserAggregate implements RootAggregate {
+  readonly id: string;
 
-  email: Email;
+  readonly email: Email;
 
-  name: Name;
+  readonly name: Name;
 
-  password: Password;
+  readonly password: Password;
 
-  constructor(name: Name, email: Email, password: Password, id?: string) {
-    super();
+  readonly domainEvents: readonly DomainEvent[] = [];
+
+  constructor(
+    name: Name,
+    email: Email,
+    password: Password,
+    domainEvents: readonly DomainEvent[],
+    id?: string,
+  ) {
     this.id = id || uuid();
     this.name = name;
     this.email = email;
     this.password = password;
+    this.domainEvents = domainEvents;
   }
 
   public getName(): string {
@@ -42,7 +51,7 @@ export class UserAggregate extends RootAggregate {
     return this.password.getValue();
   }
 
-  public getDeIdentifiedUser(): User {
+  public getDeIdentifiedUser(): DeIdentifiedUser {
     return {
       id: this.id,
       name: this.name.getKey(),
@@ -51,16 +60,21 @@ export class UserAggregate extends RootAggregate {
     };
   }
 
+  public getDomainEvents(): readonly DomainEvent[] {
+    return this.domainEvents;
+  }
+
   public static create(
     rawName: string,
     rawEmail: string,
     rawPassword: string,
+    domainEvents: readonly DomainEvent[] = [],
     id?: string,
   ): UserAggregate {
     const name = new Name(rawName);
     const email = new Email(rawEmail);
     const password = new Password(rawPassword);
 
-    return new UserAggregate(name, email, password, id);
+    return new UserAggregate(name, email, password, domainEvents, id);
   }
 }

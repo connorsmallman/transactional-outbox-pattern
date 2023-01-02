@@ -1,17 +1,7 @@
 import { DomainEvent } from './DomainEvent';
 
-export class RootAggregate {
-  domainEvents: DomainEvent[] = [];
+export interface RootAggregate {
+  readonly domainEvents: readonly DomainEvent[];
 
-  getDomainEvents(): DomainEvent[] {
-    return this.domainEvents;
-  }
-
-  addDomainEvent(domainEvent: DomainEvent): void {
-    this.domainEvents.push(domainEvent);
-  }
-
-  clearDomainEvents(): void {
-    this.domainEvents = [];
-  }
+  getDomainEvents(): readonly DomainEvent[];
 }

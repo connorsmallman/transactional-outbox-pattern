@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { OrganisationsController } from './infrastructure/http/OrganisationsController';
-import { AddMemberToOrganisationUseCase } from './usecases/AddMemberToOrganisation';
+import { AddMemberToOrganisationUseCase } from './usecases/AddMemberToOrganisationUseCase';
 import { CreateOrganisationUseCase } from './usecases/CreateOrganisationUseCase';
 import { OrganisationRepository } from './domain/OrganisationRepository';
 import { Organisation as OrganisationTypeormEntity } from './infrastructure/db/typeorm/entities/Organisation';

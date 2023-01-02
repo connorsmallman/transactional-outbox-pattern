@@ -1,17 +1,15 @@
-type MemberProps = {
-  name: string;
-  role: string;
-};
-export class Member {
-  id: string;
-  props: MemberProps;
+import { MemberName } from './MemberName';
 
-  constructor(props, id) {
+export class Member {
+  readonly id: string;
+  readonly name: MemberName;
+
+  constructor(name: MemberName, id) {
     this.id = id;
-    this.props = props;
+    this.name = name;
   }
 
-  static create(props: MemberProps, id): Member {
-    return new Member(props, id);
+  static create(name, id): Member {
+    return new Member(name, id);
   }
 }

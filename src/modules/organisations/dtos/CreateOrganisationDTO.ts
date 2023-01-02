@@ -1,3 +1,4 @@
-export class CreateOrganisationDTO {
-  name: string;
+export interface CreateOrganisationDTO {
+  readonly name: string;
 }
+

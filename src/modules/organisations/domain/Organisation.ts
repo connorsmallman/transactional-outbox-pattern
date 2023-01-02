@@ -1,3 +1,7 @@
 export class Organisation {
-  name: string;
+  readonly name: string;
+
+  constructor(name) {
+    this.name = name;
+  }
 }
