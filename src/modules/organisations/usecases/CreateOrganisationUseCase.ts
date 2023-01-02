@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { OrganisationRepository } from '../domain/OrganisationRepository';
 import { CreateOrganisationDTO } from '../dtos/CreateOrganisationDTO';
+import { OrganisationFactory } from '../domain/OrganisationFactory';
 
 @Injectable()
 export class CreateOrganisationUseCase {
@@ -9,7 +10,10 @@ export class CreateOrganisationUseCase {
     private readonly organisationRepository: OrganisationRepository,
   ) {}
 
-  execute(createOrganisationDto: CreateOrganisationDTO): Promise<void> {
-    return this.organisationRepository.create(createOrganisationDto);
+  execute(createOrganisationDTO: CreateOrganisationDTO): Promise<void> {
+    const organisation = OrganisationFactory.createNewOrganisation(
+      createOrganisationDTO.name,
+    );
+    return this.organisationRepository.save(organisation);
   }
 }

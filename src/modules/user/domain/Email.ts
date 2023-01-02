@@ -3,8 +3,8 @@ export class Email {
   private readonly value: string;
   private readonly key: string;
 
-  constructor(value: string, key?: string) {
-    this.value = value;
+  constructor(value?: string, key?: string) {
+    this.value = value || '';
     this.key = key || uuid();
   }
 

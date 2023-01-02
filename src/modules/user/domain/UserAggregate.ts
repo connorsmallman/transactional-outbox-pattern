@@ -4,43 +4,51 @@ import { Email } from './Email';
 import { Password } from './Password';
 import { Name } from './Name';
 
-import { User } from './User';
 import { RootAggregate } from '../../../shared/domain/RootAggregate';
 
-type UserProps = {
-  name: Name;
-  email: Email;
-  password: Password;
-};
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
 export class UserAggregate extends RootAggregate {
   id: string;
-  props: UserProps;
 
-  constructor(props: UserProps, id?: string) {
+  email: Email;
+
+  name: Name;
+
+  password: Password;
+
+  constructor(name: Name, email: Email, password: Password, id?: string) {
     super();
     this.id = id || uuid();
-    this.props = props;
+    this.name = name;
+    this.email = email;
+    this.password = password;
   }
 
-  get name(): string {
-    return this.props.name.getValue();
+  public getName(): string {
+    return this.name.getValue();
   }
 
-  get email(): string {
-    return this.props.email.getValue();
+  public getEmail(): string {
+    return this.email.getValue();
   }
 
-  get password(): string {
-    return this.props.password.getKey();
+  public getPassword(): string {
+    return this.password.getValue();
   }
 
   public getDeIdentifiedUser(): User {
-    return new User(
-      this.id,
-      this.props.name.getKey(),
-      this.props.email.getKey(),
-      this.props.password.getKey(),
-    );
+    return {
+      id: this.id,
+      name: this.name.getKey(),
+      email: this.email.getKey(),
+      password: this.password.getKey(),
+    };
   }
 
   public static create(
@@ -53,6 +61,6 @@ export class UserAggregate extends RootAggregate {
     const email = new Email(rawEmail);
     const password = new Password(rawPassword);
 
-    return new UserAggregate({ name, email, password }, id);
+    return new UserAggregate(name, email, password, id);
   }
 }

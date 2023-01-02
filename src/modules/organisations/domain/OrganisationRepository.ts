@@ -25,39 +25,6 @@ export class OrganisationRepository {
     );
   }
 
-  async create(createOrganisationDto: CreateOrganisationDTO): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    const event = new OrganisationCreatedEvent(createOrganisationDto);
-
-    try {
-      const organisation = OrganisationAggregate.create({
-        name: createOrganisationDto.name,
-        members: [],
-      });
-      const organisationTypeormEntity = new OrganisationTypeormEntity();
-      organisationTypeormEntity.id = organisation.id;
-      organisationTypeormEntity.name = createOrganisationDto.name;
-      await queryRunner.manager.save(organisationTypeormEntity);
-
-      const outboxTypeormEntity = new OutboxTypeormEntity();
-      outboxTypeormEntity.name = event.constructor.name;
-      outboxTypeormEntity.payload = organisation;
-      outboxTypeormEntity.timestamp = event.dateTimeOccurred;
-      await queryRunner.manager.save(outboxTypeormEntity);
-
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      return Promise.reject(err);
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   async save(organisation: OrganisationAggregate): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
 
