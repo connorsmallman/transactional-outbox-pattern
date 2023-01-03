@@ -5,21 +5,31 @@ import { UserFactory } from '../domain/UserFactory';
 import { FailedToCreateUserError } from '../domain/errors/FailedToCreateUserError';
 import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import { CountryLookupService } from '../services/CountryLookupService';
 
 @Injectable()
 export class CreateUserUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly countryLookupService: CountryLookupService,
+  ) {}
   execute(
     userDTO: CreateUserDTO,
   ): taskEither.TaskEither<FailedToCreateUserError, void> {
     return pipe(
-      taskEither.of(
+      taskEither.tryCatch(
+        () => this.countryLookupService.lookup(userDTO.countryIsoCode),
+        (error: unknown) => new Error(String(error)),
+      ),
+      taskEither.map((country) =>
         UserFactory.createNewUser(
           userDTO.name,
           userDTO.email,
           userDTO.password,
-      )),
-      taskEither.chain((user) => this.userRepository.save(user)),
+          country,
+        ),
+      ),
+      taskEither.map((user) => this.userRepository.save(user)),
       taskEither.mapLeft((error) => {
         return new FailedToCreateUserError(error.message);
       }),

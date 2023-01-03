@@ -5,6 +5,7 @@ import { Name } from './Name';
 import { RootAggregate } from '../../../shared/domain/RootAggregate';
 import { DomainEvent } from '../../../shared/domain/DomainEvent';
 import { v4 } from 'uuid';
+import { Country } from './Country';
 
 type DeIdentifiedUser = {
   readonly id: string;
@@ -23,12 +24,15 @@ export class UserAggregate implements RootAggregate {
 
   readonly password: Password;
 
+  readonly country: Country;
+
   readonly domainEvents: readonly DomainEvent[] = [];
 
   constructor(
     name: Name,
     email: Email,
     password: Password,
+    country: Country,
     domainEvents: readonly DomainEvent[],
     id?: string,
   ) {
@@ -36,6 +40,7 @@ export class UserAggregate implements RootAggregate {
     this.name = name;
     this.email = email;
     this.password = password;
+    this.country = country;
     this.domainEvents = domainEvents;
   }
 
@@ -68,13 +73,23 @@ export class UserAggregate implements RootAggregate {
     rawName: string,
     rawEmail: string,
     rawPassword: string,
+    rawCountry: {
+      readonly id: string;
+      readonly name: string;
+      readonly isoCode: string;
+    },
     domainEvents: readonly DomainEvent[] = [],
     id?: string,
   ): UserAggregate {
     const name = new Name(rawName);
     const email = new Email(rawEmail);
     const password = new Password(rawPassword);
+    const country = new Country(
+      rawCountry.id,
+      rawCountry.name,
+      rawCountry.isoCode,
+    );
 
-    return new UserAggregate(name, email, password, domainEvents, id);
+    return new UserAggregate(name, email, password, country, domainEvents, id);
   }
 }

@@ -4,4 +4,6 @@ export interface CreateUserDTO {
   readonly email: string;
 
   readonly password: string;
+
+  readonly countryIsoCode: string;
 }

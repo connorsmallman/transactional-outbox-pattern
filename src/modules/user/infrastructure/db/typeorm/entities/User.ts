@@ -1,5 +1,6 @@
 /*eslint-disable functional/prefer-readonly-type */
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { Country } from './Country';
 @Entity()
 export class User extends BaseEntity {
   @PrimaryColumn('uuid')
@@ -13,4 +14,7 @@ export class User extends BaseEntity {
 
   @Column()
   password: string;
+
+  @ManyToOne(() => Country, (country) => country.id)
+  country: Country;
 }

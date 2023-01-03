@@ -19,6 +19,7 @@ export class UsersController {
       name: body.name,
       email: body.email,
       password: body.password,
+      countryIsoCode: body.countryIsoCode,
     })();
     if (either.isLeft(response)) {
       throw new Error(response.left.message);

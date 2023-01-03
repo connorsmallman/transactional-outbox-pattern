@@ -7,6 +7,7 @@ import { Password } from './Password';
 import { UserCreatedEvent } from './events/UserCreatedEvent';
 import { Injectable } from '@nestjs/common';
 import { IdentificationLookupService } from '../services/IdentificationLookupService';
+import { Country } from './Country';
 
 @Injectable()
 export class UserFactory {
@@ -18,6 +19,7 @@ export class UserFactory {
     rawName: string,
     rawEmail: string,
     rawPassword: string,
+    country: Country,
   ): UserAggregate {
     const name = new Name(rawName);
     const email = new Email(rawEmail);
@@ -28,6 +30,7 @@ export class UserFactory {
       name,
       email,
       password,
+      country,
       [new UserCreatedEvent(id)],
       id,
     );
@@ -36,6 +39,11 @@ export class UserFactory {
     nameKey: string,
     emailKey: string,
     rawPassword: string,
+    rawCountry: {
+      readonly isoCode: string;
+      readonly name: string;
+      readonly id: string;
+    },
     id: string,
   ): Promise<UserAggregate> {
     const nameValue = await this.identificationLookupService.findById(nameKey);
@@ -46,7 +54,12 @@ export class UserFactory {
     const name = new Name(nameValue, nameKey);
     const email = new Email(emailValue, emailKey);
     const password = new Password(rawPassword);
+    const country = new Country(
+      rawCountry.id,
+      rawCountry.name,
+      rawCountry.isoCode,
+    );
 
-    return new UserAggregate(name, email, password, [], id);
+    return new UserAggregate(name, email, password, country, [], id);
   }
 }

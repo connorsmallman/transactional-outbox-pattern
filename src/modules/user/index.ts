@@ -5,11 +5,13 @@ import { UserRepository } from './domain/UserRepository';
 import { GetUserUseCase } from './usecases/GetUserUseCase';
 import { UserFactory } from './domain/UserFactory';
 import { IdentificationLookupService } from './services/IdentificationLookupService';
+import { CountryLookupService } from './services/CountryLookupService';
 
 @Module({
   imports: [],
   controllers: [UsersController],
   providers: [
+    CountryLookupService,
     CreateUserUseCase,
     GetUserUseCase,
     UserFactory,

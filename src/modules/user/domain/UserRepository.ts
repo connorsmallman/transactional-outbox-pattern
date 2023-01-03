@@ -34,6 +34,7 @@ export class UserRepository {
               userTypeormEntity.name,
               userTypeormEntity.email,
               userTypeormEntity.password,
+              userTypeormEntity.country,
               userTypeormEntity.id,
             ),
           (error: unknown) => new Error('Failed to create user from raw data'),
