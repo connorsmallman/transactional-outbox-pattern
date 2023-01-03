@@ -35,20 +35,17 @@ export class UserFactory {
   async createFromPersistence(
     nameKey: string,
     emailKey: string,
-    passwordKey: string,
+    rawPassword: string,
     id: string,
   ): Promise<UserAggregate> {
     const nameValue = await this.identificationLookupService.findById(nameKey);
     const emailValue = await this.identificationLookupService.findById(
       emailKey,
     );
-    const passwordValue = await this.identificationLookupService.findById(
-      passwordKey,
-    );
 
     const name = new Name(nameValue, nameKey);
     const email = new Email(emailValue, emailKey);
-    const password = new Password(passwordValue, passwordKey);
+    const password = new Password(rawPassword);
 
     return new UserAggregate(name, email, password, [], id);
   }

@@ -47,12 +47,11 @@ export class UserRepository {
       taskEither.tryCatch(
         () =>
           this.dataSource.transaction(async (entityManager) => {
-            const userTypeormEntity = new UserTypeormEntity({
-              name: user.name,
-              email: user.email,
-              password: user.password,
-              id: user.id,
-            });
+            const userTypeormEntity = new UserTypeormEntity();
+            userTypeormEntity.id = user.id;
+            userTypeormEntity.name = user.name.getKey();
+            userTypeormEntity.email = user.email.getKey();
+            userTypeormEntity.password = user.password.getValue();
             await entityManager.save(userTypeormEntity);
 
             const outbox = user.getDomainEvents();

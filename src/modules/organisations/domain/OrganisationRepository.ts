@@ -48,10 +48,9 @@ export class OrganisationRepository {
       taskEither.tryCatch(
         () =>
           this.dataSource.transaction(async (entityManager) => {
-            const organisationTypeormEntity = new OrganisationTypeormEntity({
-              name: organisation.name,
-              id: organisation.id,
-            });
+            const organisationTypeormEntity = new OrganisationTypeormEntity();
+            organisationTypeormEntity.id = organisation.id;
+            organisationTypeormEntity.name = organisation.name.value;
             await entityManager.save(organisationTypeormEntity);
 
             const outbox = organisation.getDomainEvents();

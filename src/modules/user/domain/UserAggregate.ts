@@ -10,6 +10,7 @@ type DeIdentifiedUser = {
   readonly id: string;
   readonly email: string;
   readonly name: string;
+
   readonly password: string;
 };
 
@@ -55,7 +56,7 @@ export class UserAggregate implements RootAggregate {
       id: this.id,
       name: this.name.getKey(),
       email: this.email.getKey(),
-      password: this.password.getKey(),
+      password: this.password.getValue(),
     };
   }
 
