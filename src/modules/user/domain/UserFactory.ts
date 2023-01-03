@@ -46,9 +46,13 @@ export class UserFactory {
     },
     id: string,
   ): Promise<UserAggregate> {
-    const nameValue = await this.identificationLookupService.findById(nameKey);
-    const emailValue = await this.identificationLookupService.findById(
+    const nameValue = await this.identificationLookupService.lookup(
+      nameKey,
+      rawCountry.isoCode,
+    );
+    const emailValue = await this.identificationLookupService.lookup(
       emailKey,
+      rawCountry.isoCode,
     );
 
     const name = new Name(nameValue, nameKey);
