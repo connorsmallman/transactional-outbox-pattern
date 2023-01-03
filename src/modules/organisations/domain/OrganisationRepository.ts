@@ -56,11 +56,10 @@ export class OrganisationRepository {
             const outbox = organisation.getDomainEvents();
 
             for (const event of outbox) {
-              const outboxTypeormEntity = new OutboxTypeormEntity({
-                name: event.constructor.name,
-                payload: event.payload,
-                timestamp: event.dateTimeOccurred,
-              });
+              const outboxTypeormEntity = new OutboxTypeormEntity();
+              outboxTypeormEntity.name = event.constructor.name;
+              outboxTypeormEntity.payload = event.payload;
+              outboxTypeormEntity.timestamp = event.dateTimeOccurred;
               await entityManager.save(outboxTypeormEntity);
             }
           }),
