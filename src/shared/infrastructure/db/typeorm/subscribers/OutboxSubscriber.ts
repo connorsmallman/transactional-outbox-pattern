@@ -8,7 +8,7 @@ import { Outbox } from '../entities/Outbox';
 export class OutboxSubscriber implements EntitySubscriberInterface {
   constructor(
     @InjectDataSource() readonly datasource: DataSource,
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     datasource.subscribers.push(this);
   }

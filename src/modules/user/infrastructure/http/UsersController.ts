@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { CreateUserUseCase } from '../../usecases/CreateUserUseCase';
 import { GetUserUseCase } from '../../usecases/GetUserUseCase';
 import { either } from 'fp-ts';

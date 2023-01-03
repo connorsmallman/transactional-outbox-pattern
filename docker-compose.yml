@@ -9,6 +9,7 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
   db:
     image: postgres:14.1-alpine
     restart: always
