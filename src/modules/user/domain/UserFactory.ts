@@ -31,10 +31,25 @@ export class UserFactory {
       email,
       password,
       country,
-      [new UserCreatedEvent(id)],
+      [
+        new UserCreatedEvent({
+          id,
+          name: {
+            key: name.getKey(),
+            value: name.getValue(),
+          },
+          email: {
+            key: email.getKey(),
+            value: email.getValue(),
+          },
+          password: password.getValue(),
+          countryIsoCode: country.isoCode,
+        }),
+      ],
       id,
     );
   }
+
   async createFromPersistence(
     nameKey: string,
     emailKey: string,

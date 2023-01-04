@@ -21,7 +21,7 @@ import { UserCreatedMessageRelay } from './subscribers/UserCreatedMessageRelay';
           queue: 'organisation_service',
           noAck: false,
           queueOptions: {
-            durable: false,
+            durable: true,
           },
         },
       },

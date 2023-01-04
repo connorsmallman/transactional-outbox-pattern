@@ -1,7 +1,8 @@
+import { either } from 'fp-ts';
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+
 import { CreateUserUseCase } from '../../usecases/CreateUserUseCase';
 import { GetUserUseCase } from '../../usecases/GetUserUseCase';
-import { either } from 'fp-ts';
 
 @Controller('users')
 export class UsersController {
@@ -24,7 +25,9 @@ export class UsersController {
     if (either.isLeft(response)) {
       throw new Error(response.left.message);
     } else {
-      return response.right;
+      return {
+        id: response.right.id,
+      }
     }
   }
 

@@ -14,8 +14,9 @@ async function bootstrap() {
     options: {
       urls: ['amqp://guest:guest@rabbitmq:5672'],
       queue: 'organisation_service',
+      noAck: false,
       queueOptions: {
-        durable: false,
+        durable: true,
       },
     },
   });

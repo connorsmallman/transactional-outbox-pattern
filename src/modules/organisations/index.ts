@@ -22,7 +22,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           queue: 'organisation_service',
           noAck: false,
           queueOptions: {
-            durable: false,
+            durable: true,
           },
         },
       },
