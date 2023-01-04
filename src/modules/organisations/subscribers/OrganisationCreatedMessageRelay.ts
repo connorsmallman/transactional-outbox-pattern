@@ -5,12 +5,17 @@ import { ClientProxy } from '@nestjs/microservices';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-type OrganisationCreatedEventWithId = OrganisationCreatedEvent & { id: string };
+type OrganisationCreatedEventWithId = OrganisationCreatedEvent & {
+  readonly id: string;
+};
 
+// Our message relay is a simple class that listens for events and sends them to a message broker
+// It then deletes the messages from the outbox
+// Here we could acknowledge the message from the message broker
 export class OrganisationCreatedMessageRelay {
   constructor(
-    @Inject('ORGANISATION_SERVICE') private client: ClientProxy,
-    @InjectDataSource() private dataSource: DataSource,
+    @Inject('ORGANISATION_SERVICE') private readonly client: ClientProxy,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
   @OnEvent(OrganisationCreatedEvent.name)
   async handleOrganisationCreatedEvent(

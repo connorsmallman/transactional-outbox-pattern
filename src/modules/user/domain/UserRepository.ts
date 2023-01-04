@@ -43,6 +43,10 @@ export class UserRepository {
     );
   }
 
+  // Here we save the aggregate to the database as a transaction
+  // We also save the domain events to the outbox table as a transaction
+  // This means if the aggregate is saved but the events are not, the aggregate will be rolled back
+  // If the service stops before the events are sent to the message broker, the events will be sent again on the next service start
   save(user: UserAggregate): taskEither.TaskEither<Error, UserAggregate> {
     return pipe(
       taskEither.tryCatch(

@@ -8,10 +8,13 @@ import { UserCreatedEvent } from '../domain/events/UserCreatedEvent';
 
 type UserCreatedEventWithId = UserCreatedEvent & { readonly id: string };
 
+// Our message relay is a simple class that listens for events and sends them to a message broker
+// It then deletes the messages from the outbox
+// Here we acknowledge the message from the message broker and make it transactional
 export class UserCreatedMessageRelay {
   constructor(
-    @Inject('ORGANISATION_SERVICE') private client: ClientProxy,
-    @InjectDataSource() private dataSource: DataSource,
+    @Inject('ORGANISATION_SERVICE') private readonly client: ClientProxy,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
   @OnEvent(UserCreatedEvent.name)
   async handleOrganisationCreatedEvent(payload: UserCreatedEventWithId) {

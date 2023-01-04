@@ -50,6 +50,7 @@ export class UserFactory {
     );
   }
 
+  // Not sure if I'm happy with the service lookup here, but it's a start and the goal is to move it to the data layer
   async createFromPersistence(
     nameKey: string,
     emailKey: string,

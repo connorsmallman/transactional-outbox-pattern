@@ -17,6 +17,9 @@ export class CreateOrganisationUseCase {
   execute(
     createOrganisationDTO: CreateOrganisationDTO,
   ): taskEither.TaskEither<FailedToCreateOrganisationError, void> {
+    // Use the factory to create a new OrganisationAggregate
+    // Persist the OrganisationAggregate to the database using the repository
+    // Return a TaskEither
     return pipe(
       taskEither.of(
         OrganisationFactory.createNewOrganisation(createOrganisationDTO.name),

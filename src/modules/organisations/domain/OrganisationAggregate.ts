@@ -6,6 +6,8 @@ import { RootAggregate } from '../../../shared/domain/RootAggregate';
 import { DomainEvent } from '../../../shared/domain/DomainEvent';
 import { OrganisationName } from './OrganisationName';
 
+// This is our root aggregate
+// It is the only aggregate that can be saved to the database
 export class OrganisationAggregate implements RootAggregate {
   readonly id: string;
   readonly name: OrganisationName;
@@ -39,6 +41,7 @@ export class OrganisationAggregate implements RootAggregate {
   }
 
   public addMember(member: Member): OrganisationAggregate {
+    // We return a new instance of the OrganisationAggregate with the new member added
     const newMembers = [...this.members, member];
     const newDomainEvents = [
       ...this.domainEvents,
